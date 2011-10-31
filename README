@@ -1,0 +1,35 @@
+Javascript can fake a hashtable (or associative array) with an object… kind of. But it’s not very good and you can’t even do simple things on it like easily determine its length. So we decided to write our own.
+
+One of the really awesome things that I added in is the sorting. Not only can you make it short as a one-dimensional array… but you can have it sort as a multi-dimensional array (kind of like like php multisort but easier… or maybe like a database table)
+
+Public methods:
+
+get(key, value) – Overloaded… no argument returns all values, 1 argument will return the given value at that key if it exists, 2 arguments will get OR set the value… if it does not exist then the second argument will be the default value.
+
+set(key, value) – sets the value for the key
+
+key(key) – Overloaded… no argument will return an array of keys, one argument will return the index of that key (not the value).
+
+exists(key) – returns boolean if the an item with that key exists or not
+
+length – returns number of items
+
+asc(col, style) – sets the direction of the sort to ascending…. if you are storing objects the col argument lets you sort on that column… otherwise just use a null column if you’re storing in one-dimension… style can be ‘string’ or ‘numeric’ (string is default)
+
+desc(col, style) – like asc but sets sort order to ascending
+
+Sample usage:
+
+
+// Instantiate the hashtable and feed it some initial key/value pairs
+var hash = new _.HashTable([
+  apples:{genre:'fruit', color:'red'},
+  oranges:{genre:'fruit', color:'orange'},
+  carrot:{genre:'veggie', color:'orange'}
+]);
+// Add another value
+hash.set('cucumber', {genre:'veggie', color:'green'});
+// Since grape does not yet exist, this will add it also
+hash.get('grape', {genre:'fruit', color:'purple'});
+// retrieve a list of values sorted by color
+var valuesSortedByColor = hash.asc('color').get();
