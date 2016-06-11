@@ -13,7 +13,7 @@ _.HashTable = function(data) {
 	var items = [];
 	var keys = [];
 	var offset = 0;
-	var sortby = [{ key:null, order:null, style:'string' }];
+	var sortBy = [{ key:null, order:null, style:'string' }];
 	// Public properties
 	me.count = 0;
 	// Private methods
@@ -28,10 +28,10 @@ _.HashTable = function(data) {
 	};
 	var sorter = function(a, b) {
 		try {
-			if (sortby.length > 0) {
+			if (sortBy.length > 0) {
 				var val = 0;
-				for (var i=0; i < sortby.length; i++) {
-					var s = sortby[i];
+				for (var i=0; i < sortBy.length; i++) {
+					var s = sortBy[i];
 					if (s.key) {
 						if (s.style == 'numeric') {
 							if (s.order == 'ASC') val = a[s.key] - b[s.key];
@@ -65,6 +65,24 @@ _.HashTable = function(data) {
 			return 0;
 		}
 	};
+	var resetSorter = function(reset) {
+		if (typeof reset == 'undefined' || reset == true) {
+			sortBy = [];
+		}
+	};
+	var sort = function(arguments, type, reset) {
+		resetSorter(reset);
+		if (!Array.isArray(arguments)) {
+			arguments = [arguments];
+		}
+		for (var i=0; i < arguments.length; i++) {
+			var arr = arguments[i].split(' ');
+			sortBy.push({
+				key:arr[0], order:type, style:arr[1]
+			});
+		}
+		return me;
+	};
 	var addIndex = function(key, val) {
 		if (isObject(val)) {
 			val.key = key;
@@ -72,7 +90,7 @@ _.HashTable = function(data) {
 		map[key] = items.push(val) - 1;
 		keys.push(key);
 		me.count++;
-	}
+	};
 	var removeIndex = function(start) {
 		// Remove from array
 		items.splice(start, 1);
@@ -85,6 +103,7 @@ _.HashTable = function(data) {
 		map = new_map;
 		// Offset for new data coming in
 		offset++;
+		me.count--;
 		return me;
 	};
 	var indexOf = function(key) {
@@ -100,7 +119,7 @@ _.HashTable = function(data) {
 	};
 	me.get = function(key, defaultVal) {
 		if (arguments.length == 0) {
-			if (sortby.length > 0) {
+			if (sortBy.length > 0) {
 				var temp = [];
 				for (var i=0; i < items.length; i++) {
 					temp.push(items[i]);
@@ -167,29 +186,13 @@ _.HashTable = function(data) {
 	me.length = function() {
 		return items.length;
 	};
-	me.asc = function() {
-		sortby = [];
-		for (var i=0; i < arguments.length; i++) {
-			var arr = arguments[i].split(' ');
-			sortby.push({
-				key:arr[0], order:'ASC', style:arr[1]
-			});
-		}
-		return me;
+	me.asc = function(arguments, reset) {
+		return sort(arguments, 'ASC', reset);
 	};
-	me.desc = function() {
-		sortby = [];
-		for (var i=0; i < arguments.length; i++) {
-			var arr = arguments[i].split(' ');
-			sortby.push({
-				key:arr[0], order:'DESC', style:arr[1]
-			});
-		}
-		return me;
+	me.desc = function(arguments, reset) {
+		return sort(arguments, 'DESC', reset);
 	};
 	// Accept data on instantiation
-	if (typeof data != 'undefined') {
-		me.import(data);
-	}
+	me.import(data);
 	return me;
 };
