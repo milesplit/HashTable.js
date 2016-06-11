@@ -1,13 +1,12 @@
-/*
-Created by MileSplit, Inc. 2011 - http://www.milesplit.com
-License: Open Source, With Attribution (leave this comment in place)
-More info: http://milesplit.wordpress.com/open-source/hashtable-js/
-*/
-
+/**
+ * Created by MileSplit, Inc. 2011 - http://www.milesplit.com
+ * License: Open Source, With Attribution (leave this comment in place)
+ * More info: http://milesplit.wordpress.com/open-source/hashtable-js/
+ */
 
 var _ = _ || {};
 
-_.HashTable = function(o) {
+_.HashTable = function(data) {
 	// Initialize
 	var me = this;
 	var map = {};
@@ -15,21 +14,18 @@ _.HashTable = function(o) {
 	var keys = [];
 	var offset = 0;
 	var sortby = [{ key:null, order:null, style:'string' }];
-	var isObject = function(v) {
-	  if (typeof(v) == "object") {
-	    if (v === null) return false;
-	    if (v.constructor == (new Array).constructor) return false
-	    if (v.constructor == (new Date).constructor) return false;
-	    if (v.constructor == (new RegExp).constructor) return false;
-	    return true;
-	  }
-	  return false;
-	};
-	for (key in o) {
-		map[key] = items.push(o[key]) - 1;
-		keys.push(key);
-	};
+	// Public properties
+	me.count = 0;
 	// Private methods
+	var isObject = function(v) {
+		if (typeof v == "object") {
+			if (v.constructor == (new Array).constructor) return false;
+			if (v.constructor == (new Date).constructor) return false;
+			if (v.constructor == (new RegExp).constructor) return false;
+			return true;
+		}
+		return false;
+	};
 	var sorter = function(a, b) {
 		try {
 			if (sortby.length > 0) {
@@ -69,7 +65,15 @@ _.HashTable = function(o) {
 			return 0;
 		}
 	};
-	var removeAt = function(start) {
+	var addIndex = function(key, val) {
+		if (isObject(val)) {
+			val.key = key;
+		}
+		map[key] = items.push(val) - 1;
+		keys.push(key);
+		me.count++;
+	}
+	var removeIndex = function(start) {
 		// Remove from array
 		items.splice(start, 1);
 		keys.splice(start, 1);
@@ -118,25 +122,29 @@ _.HashTable = function(o) {
 	};
 	me.push = function(val) {
 		var key = 'r' + (items.length + offset);
-		if (isObject(val)) {
-			val.key = key;
-		}
-		map[key] = items.push(val) - 1;
-		keys.push(key);
+		addIndex(key, val);
 		return key;
+	};
+	me.import = function (data) {
+		if (Array.isArray(data) || typeof data == 'object') {
+			for (var i in data) {
+				me.push(data[i]);
+			}
+		}
+		return me;
 	};
 	me.set = function(key, val) {
 		if (me.exists(key)) {
 			items[map[key]] = val;
 		} else {
-			map[key] = items.push(val) - 1;
+			addIndex(key, val);
 		}
 		return me;
 	};
 	me.remove = function(key) {
 		var i = indexOf(key);
 		if (i >= 0) {
-			removeAt(i);
+			removeIndex(i);
 		}
 		return me;
 	};
@@ -159,7 +167,6 @@ _.HashTable = function(o) {
 	me.length = function() {
 		return items.length;
 	};
-	me.count = me.length;
 	me.asc = function() {
 		sortby = [];
 		for (var i=0; i < arguments.length; i++) {
@@ -180,5 +187,9 @@ _.HashTable = function(o) {
 		}
 		return me;
 	};
+	// Accept data on instantiation
+	if (typeof data != 'undefined') {
+		me.import(data);
+	}
 	return me;
 };
