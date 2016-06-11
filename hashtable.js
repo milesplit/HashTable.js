@@ -69,6 +69,27 @@ _.HashTable = function(o) {
 			return 0;
 		}
 	};
+	var removeAt = function(start) {
+		// Remove from array
+		items.splice(start, 1);
+		keys.splice(start, 1);
+		// Now remap it
+		var new_map = {};
+		for (var i=0; i < keys.length; i++) {
+			new_map[keys[i]] = i;
+		}
+		map = new_map;
+		// Offset for new data coming in
+		offset++;
+		return me;
+	};
+	var indexOf = function(key) {
+		if (me.exists(key)) {
+			return map[key];
+		} else {
+			return - 1;
+		}
+	};
 	// Public methods
 	me.item = function(i) {
 		return items[i];
@@ -112,32 +133,11 @@ _.HashTable = function(o) {
 		}
 		return me;
 	};
-	me.indexOf = function(key) {
-		if (me.exists(key)) {
-			return map[key];
-		} else {
-			return - 1;
-		}
-	};
 	me.remove = function(key) {
-		var i = me.indexOf(key);
+		var i = indexOf(key);
 		if (i >= 0) {
-			me.removeAt(i);
+			removeAt(i);
 		}
-		return me;
-	};
-	me.removeAt = function(start) {
-		// Remove from array
-		items.splice(start, 1);
-		keys.splice(start, 1);
-		// Now remap it
-		var new_map = {};
-		for (var i=0; i < keys.length; i++) {
-			new_map[keys[i]] = i;
-		}
-		map = new_map;
-		// Offset for new data coming in
-		offset++;
 		return me;
 	};
 	me.key = function(index) {
