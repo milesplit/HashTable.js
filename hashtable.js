@@ -13,6 +13,7 @@ _.HashTable = function(o) {
 	var map = {};
 	var items = [];
 	var keys = [];
+	var offset = 0;
 	var sortby = [{ key:null, order:null, style:'string' }];
 	var isObject = function(v) {
 	  if (typeof(v) == "object") {
@@ -95,7 +96,7 @@ _.HashTable = function(o) {
 		}
 	};
 	me.push = function(val) {
-		var key = 'r' + items.length;
+		var key = 'r' + (items.length + offset);
 		if (isObject(val)) {
 			val.key = key;
 		}
@@ -128,7 +129,6 @@ _.HashTable = function(o) {
 	me.removeAt = function(start) {
 		// Remove from array
 		items.splice(start, 1);
-		console.log(items.length);
 		keys.splice(start, 1);
 		// Now remap it
 		var new_map = {};
@@ -136,6 +136,8 @@ _.HashTable = function(o) {
 			new_map[keys[i]] = i;
 		}
 		map = new_map;
+		// Offset for new data coming in
+		offset++;
 		return me;
 	};
 	me.key = function(index) {
