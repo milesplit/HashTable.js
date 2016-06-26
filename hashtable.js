@@ -133,8 +133,7 @@ _.HashTable = function(data) {
 			return items[map[key]];
 		} else {
 			if (!me.exists(key)) {
-				map[key] = items.push(defaultVal) - 1;
-				keys.push(key);
+				addIndex(key, defaultVal);
 			}
 			return items[map[key]];
 		}
